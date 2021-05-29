@@ -47,23 +47,61 @@ function drawBoard() {
     ctx.fillText("Score: " + score, grid*0.1, grid*0.7);
 }
 
+window.addEventListener("keydown", function(e) {
+    console.log(e);
+    if (e.key == "w") {
+        head.direction = "up";
+    }
+    if (e.key == "a") {
+        head.direction = "left";
+    }
+    if (e.key == "s") {
+        head.direction = "down";
+    }
+    if (e.key == "d") {
+        head.direction = "right";
+    }
+});
+
 var head = {
     x: 0,
     y: grid,
     xv: 0,
     yv: 0,
-    speed: 1,
+    speed: 2,
     direction: undefined,
     color: colors[2]
 }
 function draw() {
-    ctx.fillStyle = head.color
+    ctx.fillStyle = head.color;
+    head.x += head.xv * head.speed;
+    head.y += head.yv * head.speed;
     ctx.fillRect(head.x, head.y, grid, grid);
 }
 function update() {
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
     drawBoard();
     draw();
+    var linedx = head.x % grid == 0;
+    var linedy = head.y % grid == 0;
+    console.log(linedx, linedy);
+    if (head.direction == "up" && linedx) {
+        head.xv = 0;
+        head.yv = -1;
+    }
+    if (head.direction == "left" && linedy) {
+        head.xv = -1;
+        head.yv = 0;
+    }
+    if (head.direction == "down" && linedx) {
+        head.xv = 0;
+        head.yv = 1;
+    }
+    if (head.direction == "right" && linedy) {
+        head.xv = 1;
+        head.yv = 0;
+    }
+
     requestAnimationFrame(update);
 }
 update();
