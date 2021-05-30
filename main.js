@@ -26,7 +26,7 @@ window.addEventListener("resize", function() {
     location = location;
 })
 
-const colors = ["#A7D948", "#8ECC39", "#5076F9", "#0BB600"];
+const colors = ["#A7D948", "#8ECC39", "#5076F9", "#0BB600", "#E7471D"];
 
 var score = 0;
 
@@ -61,6 +61,9 @@ window.addEventListener("keydown", function(e) {
     if (e.key == "d") {
         head.direction = "right";
     }
+    if (e.key == "x") {
+        head.direction = "undefined";
+    }
 });
 
 var head = {
@@ -68,23 +71,50 @@ var head = {
     y: grid,
     xv: 0,
     yv: 0,
-    speed: 2,
+    speed: grid/32,
     direction: undefined,
     color: colors[2]
 }
+var food = {
+    x: Math.floor(Math.random() * 8) * grid,
+    y: Math.floor(Math.random() * 7) * grid + grid,
+    color: colors[4]
+}
+
 function draw() {
-    ctx.fillStyle = head.color;
     head.x += head.xv * head.speed;
     head.y += head.yv * head.speed;
+    ctx.fillStyle = food.color;
+    ctx.fillRect(food.x, food.y, grid, grid);
+    ctx.fillStyle = head.color;
     ctx.fillRect(head.x, head.y, grid, grid);
+}
+function check() {
+    if (head.x+grid > food.x && head.x < food.x+grid && head.y+grid > food.y && head.y < food.y+grid) {
+        food.x = Math.round(Math.random() * 8) * grid;
+        food.y = Math.round(Math.random() * 7) * grid + grid;
+        score++;
+    }
+    if (head.x+grid > grid*10 || head.x < 0 || head.y+grid*2 > grid*11 || head.y < grid) {
+        gameover();
+    }
+}
+function gameover() {
+    // 
+    console.log("Game Over")
+    head.x = 0;
+    head.y = grid;
+    head.direction = "undefined";
+    head.xv = 0;
+    head.yv = 0;
 }
 function update() {
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
     drawBoard();
     draw();
+    check();
     var linedx = head.x % grid == 0;
     var linedy = head.y % grid == 0;
-    console.log(linedx, linedy);
     if (head.direction == "up" && linedx) {
         head.xv = 0;
         head.yv = -1;
@@ -99,6 +129,10 @@ function update() {
     }
     if (head.direction == "right" && linedy) {
         head.xv = 1;
+        head.yv = 0;
+    }
+    else if (head.direction == "undefined") {
+        head.xv = 0;
         head.yv = 0;
     }
 
